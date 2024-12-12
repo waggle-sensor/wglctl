@@ -9,15 +9,20 @@ import (
 // netCmd represents the net command
 var lorawanCmd = &cobra.Command{
 	Use:   "lorawan",
-	Short: "A brief description of the net command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Use to control lorawan.",
+	Long: "lorawan is used to control the lorawan hardware/software in your waggle deployment.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("lorawan called")
+	},
+}
+
+// lwPortalCmd represents the portal command
+var lwPortalCmd = &cobra.Command{
+	Use:   "portal",
+	Short: "Use to access ChirpStack portal.",
+	Long:  "portal is used to access the node's Chirpstack network server portal.",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("portal called")
 	},
 }
 
@@ -25,7 +30,7 @@ func init() {
 	// Add the net command to the root
 	rootCmd.AddCommand(lorawanCmd)
 
-	lorawanCmd.AddCommand(portalCmd)
+	lorawanCmd.AddCommand(lwPortalCmd)
 
 	// Here you will define your flags and configuration settings.
 

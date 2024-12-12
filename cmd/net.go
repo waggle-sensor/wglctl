@@ -9,13 +9,8 @@ import (
 // netCmd represents the net command
 var netCmd = &cobra.Command{
 	Use:   "net",
-	Short: "A brief description of the net command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Use to control network.",
+	Long: `net is used to control network in your waggle deployment.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("net called")
 	},
@@ -24,10 +19,20 @@ to quickly create a Cobra application.`,
 // switchCmd represents the switch command
 var switchCmd = &cobra.Command{
 	Use:   "switch",
-	Short: "A brief description of the switch command",
-	Long:  "A longer description of the switch command.",
+	Short: "Use to control the network switch.",
+	Long:  "switch is used to control the network switch in your waggle deployment.",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("switch called")
+	},
+}
+
+// switchPortalCmd represents the portal command
+var switchPortalCmd = &cobra.Command{
+	Use:   "portal",
+	Short: "Use to access switch portal.",
+	Long:  "portal is used to access the node's network switch portal.",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("portal called")
 	},
 }
 
@@ -39,7 +44,7 @@ func init() {
 	netCmd.AddCommand(switchCmd)
 
 	// Add the portal command as a subcommand of switch
-	switchCmd.AddCommand(portalCmd)
+	switchCmd.AddCommand(switchPortalCmd)
 
 	// Here you will define your flags and configuration settings.
 
