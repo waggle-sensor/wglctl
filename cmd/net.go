@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-
+	"strings"
+	"github.com/waggle-sensor/wglctl/logic"
 	"github.com/spf13/cobra"
 )
 
@@ -28,11 +29,38 @@ var switchCmd = &cobra.Command{
 
 // switchPortalCmd represents the portal command
 var switchPortalCmd = &cobra.Command{
-	Use:   "portal",
+	Use:   "portal <somenode> <up|down> [port]",
 	Short: "Use to access switch portal.",
-	Long:  "portal is used to access the node's network switch portal.",
+	Long:  `portal is used to access the node's network switch portal.
+	
+	Arguments:
+	  <somenode>  The vsn of the node (e.g., "W030").
+	  <up|down>   The action to perform (either "up" to start the tunnel or "down" to stop it).
+	  [port]      The local port to use for the tunnel (optional, default is 10000).`,
+	  Example: `portal W030 up 8082, portal W030 down`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("portal called")
+		// Extract arguments
+		if len(args) < 2 {
+			fmt.Println("ERROR: Missing Argument")
+			fmt.Println("Usage: portal <somenode> <up|down> [port]")
+		}
+		node := strings.ToUpper(args[0])
+		action := args[1]
+		localPort := "10000" // Default port
+
+		if len(args) >= 3 {
+			localPort = args[2]
+		}
+
+		switch action {
+		case "up":
+			logic.StartPortal(node, localPort, "net.switch.portforwading", "switch", "443")
+		case "down":
+			logic.StopTunnel(node, "net.switch.portforwading")
+		default:
+			fmt.Println("Invalid action:", action)
+			fmt.Println("Usage: portal <somenode> <up|down> [port]")
+		}
 	},
 }
 
