@@ -21,23 +21,30 @@ var lorawanCmd = &cobra.Command{
 var lwPortalCmd = &cobra.Command{
 	Use:   "portal <somenode> <up|down> [port]",
 	Short: "Use to access ChirpStack portal.",
-	Long:  "portal is used to access the node's Chirpstack network server portal.",
+	Long:  `portal is used to access the node's Chirpstack network server portal.
+	
+	Arguments:
+	  <somenode>  The vsn of the node (e.g., "W030").
+	  <up|down>   The action to perform (either "up" to start the tunnel or "down" to stop it).
+	  [port]      The local port to use for the tunnel (optional, default is 8081).`,
+	Example: `portal W030 up 8082, portal W030 down`,
 	Args:  cobra.MinimumNArgs(2), // Require at least 2 arguments
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
 		node := strings.ToUpper(args[0])
 		action := args[1]
-		port := "8081" // Default port
+		localPort := "8081" // Default port
 
 		if len(args) >= 3 {
-			port = args[2]
+			localPort = args[2]
 		}
 
 		switch action {
 		case "up":
-			logic.StartTunnel(node, port)
+			portalIp := logic.GetChirpStackIp(node)
+			logic.StartPortal(node, localPort, "lora.portforwading", portalIp, "8080")
 		case "down":
-			logic.StopTunnel(node)
+			logic.StopTunnel(node, "lora.portforwading")
 		default:
 			fmt.Println("Invalid action:", action)
 			fmt.Println("Usage: portal <somenode> <up|down> [port]")
