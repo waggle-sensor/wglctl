@@ -28,6 +28,7 @@ var lwPortalCmd = &cobra.Command{
 	  <up|down>   The action to perform (either "up" to start the tunnel or "down" to stop it).
 	  [port]      The local port to use for the tunnel (optional, default is 8081).`,
 	Example: `portal W030 up 8082, portal W030 down`,
+	ValidArgs: []string{"up","down"},
 	Args:  cobra.MinimumNArgs(2), // Require at least 2 arguments
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
