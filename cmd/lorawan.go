@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// netCmd represents the net command
+// lorawanCmd represents the lorawan command
 var lorawanCmd = &cobra.Command{
 	Use:   "lorawan",
 	Short: "Use to control lorawan.",
