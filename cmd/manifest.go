@@ -23,9 +23,9 @@ var vsnListCmd = &cobra.Command{ //TODO: add filtering
 	Run: func(cmd *cobra.Command, args []string) {
 		vsns, err := logic.FetchVSNs("https://auth.sagecontinuum.org/manifests/")
 		if err != nil {
-			fmt.Println("ERROR: %s", err)
+			fmt.Printf("ERROR: %s\n", err)
 		}
-		fmt.Printf("%s", vsns)
+		fmt.Printf("%s\n", vsns)
 	},
 }
 
