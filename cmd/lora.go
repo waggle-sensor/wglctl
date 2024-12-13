@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"fmt"
-
+	"strings"
+	"github.com/waggle-sensor/wglctl/logic"
 	"github.com/spf13/cobra"
 )
 
@@ -18,11 +19,29 @@ var lorawanCmd = &cobra.Command{
 
 // lwPortalCmd represents the portal command
 var lwPortalCmd = &cobra.Command{
-	Use:   "portal",
+	Use:   "portal <somenode> <up|down> [port]",
 	Short: "Use to access ChirpStack portal.",
 	Long:  "portal is used to access the node's Chirpstack network server portal.",
+	Args:  cobra.MinimumNArgs(2), // Require at least 2 arguments
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("portal called")
+		// Extract arguments
+		node := strings.ToUpper(args[0])
+		action := args[1]
+		port := "8081" // Default port
+
+		if len(args) >= 3 {
+			port = args[2]
+		}
+
+		switch action {
+		case "up":
+			logic.StartTunnel(node, port)
+		case "down":
+			logic.StopTunnel(node)
+		default:
+			fmt.Println("Invalid action:", action)
+			fmt.Println("Usage: portal <somenode> <up|down> [port]")
+		}
 	},
 }
 
