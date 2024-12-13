@@ -12,9 +12,6 @@ var netCmd = &cobra.Command{
 	Use:   "net",
 	Short: "Use to control network.",
 	Long: `net is used to control network in your waggle deployment.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("net called")
-	},
 }
 
 // switchCmd represents the switch command
@@ -22,9 +19,6 @@ var switchCmd = &cobra.Command{
 	Use:   "switch",
 	Short: "Use to control the network switch.",
 	Long:  "switch is used to control the network switch in your waggle deployment.",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("switch called")
-	},
 }
 
 // switchPortalCmd represents the portal command

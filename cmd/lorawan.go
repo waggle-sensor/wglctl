@@ -12,9 +12,6 @@ var lorawanCmd = &cobra.Command{
 	Use:   "lorawan",
 	Short: "Use to control lorawan.",
 	Long: "lorawan is used to control the lorawan hardware/software in your waggle deployment.",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("lorawan called")
-	},
 }
 
 // lwPortalCmd represents the portal command
