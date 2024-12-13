@@ -37,13 +37,11 @@ var switchPortalCmd = &cobra.Command{
 	  <somenode>  The vsn of the node (e.g., "W030").
 	  <up|down>   The action to perform (either "up" to start the tunnel or "down" to stop it).
 	  [port]      The local port to use for the tunnel (optional, default is 10000).`,
-	  Example: `portal W030 up 8082, portal W030 down`,
+	Example: `portal W030 up 8082, portal W030 down`,
+	ValidArgs: []string{"up","down"},
+	Args:  cobra.MinimumNArgs(2), // Require at least 2 arguments
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
-		if len(args) < 2 {
-			fmt.Println("ERROR: Missing Argument")
-			fmt.Println("Usage: portal <somenode> <up|down> [port]")
-		}
 		node := strings.ToUpper(args[0])
 		action := args[1]
 		localPort := "10000" // Default port
