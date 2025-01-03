@@ -51,7 +51,7 @@ var lwPortalCmd = &cobra.Command{
 }
 
 func init() {
-	// Add the net command to the root
+	// Add the lorawan command to the root
 	rootCmd.AddCommand(lorawanCmd)
 
 	lorawanCmd.AddCommand(lwPortalCmd)
