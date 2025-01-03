@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"fmt"
 )
 
 var cfgFile string
@@ -69,5 +70,8 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
-	
+
+	if err := viper.ReadInConfig(); err != nil { //read in the config file
+		fmt.Printf("Error reading config file: %v\n", err)
+	}
 }
