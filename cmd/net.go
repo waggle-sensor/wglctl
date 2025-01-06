@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	// "fmt"
 	"strings"
 	"github.com/waggle-sensor/wglctl/logic"
 	"github.com/spf13/cobra"
@@ -23,36 +23,72 @@ var switchCmd = &cobra.Command{
 
 // switchPortalCmd represents the portal command
 var switchPortalCmd = &cobra.Command{
-	Use:   "portal <somenode> <up|down> [port]",
+	Use:   "portal",
+	Short: "Use to control switch portal(s).",
+	Long:  "portal is used to control the node's network switch portal(s).",
+}
+
+// switchPortalupCmd represents the portal up command
+var switchPortalupCmd = &cobra.Command{
+	Use:   "up <somenode> [port]",
 	Short: "Use to access switch portal.",
-	Long:  `portal is used to access the node's network switch portal.
+	Long:  `up is used to access the node's network switch portal.
 	
 	Arguments:
 	  <somenode>  The vsn of the node (e.g., "W030").
-	  <up|down>   The action to perform (either "up" to start the tunnel or "down" to stop it).
 	  [port]      The local port to use for the tunnel (optional, default is 10000).`,
-	Example: `portal W030 up 8082, portal W030 down`,
-	ValidArgs: []string{"up","down"},
-	Args:  cobra.MinimumNArgs(2), // Require at least 2 arguments
+	Example: `portal up W030, portal up W030 8082`,
+	Args:  cobra.MinimumNArgs(1), // Require at least 1 argument
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
 		node := strings.ToUpper(args[0])
-		action := args[1]
 		localPort := "10000" // Default port
 
-		if len(args) >= 3 {
-			localPort = args[2]
+		if len(args) >= 2 {
+			localPort = args[1]
 		}
 
-		switch action {
-		case "up":
-			logic.StartPortal(node, localPort, "net.switch.portforwading", "switch", "https", "443")
-		case "down":
-			logic.StopTunnel(node, "net.switch.portforwading")
-		default:
-			fmt.Println("Invalid action:", action)
-			fmt.Println("Usage: portal <somenode> <up|down> [port]")
+		logic.StartPortal(node, localPort, "net.switch.portforwading", "switch", "https", "443")
+	},
+}
+
+// switchPortaldownCmd represents the portal down command
+var switchPortaldownCmd = &cobra.Command{
+	Use:   "down <somenode>",
+	Short: "Use to terminate switch portal.",
+	Long:  `down is used to terminate the node's network switch portal.
+	
+	Arguments:
+	  <somenode>  The vsn of the node (e.g., "W030").`,
+	Example: `portal down W030`,
+	Args:  cobra.ExactArgs(1), // Require exactly 1 argument
+	Run: func(cmd *cobra.Command, args []string) {
+		// Extract arguments
+		node := strings.ToUpper(args[0])
+
+		logic.StopTunnel(node, "net.switch.portforwading")
+	},
+}
+
+// switchPortaldownCmd represents the portal ls command
+var switchPortalListCmd = &cobra.Command{
+	Use:   "ls [somenode]",
+	Short: "Use to list switch portal(s).",
+	Long:  `ls is used to list active network switch portal(s).
+	
+	Arguments:
+	  [somenode]  The vsn of the node (e.g., "W030"). optional, default is all.`,
+	Example: `portal ls, portal ls W030`,
+	Args:  cobra.MaximumNArgs(1), // Require no greater than 1 argument
+	Run: func(cmd *cobra.Command, args []string) {
+		// Extract arguments
+		node := "" // Default node
+
+		if len(args) >= 1 {
+			node = strings.ToUpper(args[0])
 		}
+
+		logic.ListTunnel(node, "net.switch.portforwading")
 	},
 }
 
@@ -65,6 +101,11 @@ func init() {
 
 	// Add the portal command as a subcommand of switch
 	switchCmd.AddCommand(switchPortalCmd)
+
+	// Add the actions for the portal command
+	switchPortalCmd.AddCommand(switchPortalupCmd)
+	switchPortalCmd.AddCommand(switchPortaldownCmd)
+	switchPortalCmd.AddCommand(switchPortalListCmd)
 
 	// Here you will define your flags and configuration settings.
 
