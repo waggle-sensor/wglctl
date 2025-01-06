@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	// "fmt"
 	"strings"
 	"github.com/waggle-sensor/wglctl/logic"
 	"github.com/spf13/cobra"
