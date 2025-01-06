@@ -137,3 +137,46 @@ func StopTunnel(node, configObject string) {
 		fmt.Printf("Error updating configuration file: %v\n", err)
 	}
 }
+
+// ListTunnel lists the current portals that are up.
+//  node: The vsn of the node (optional).
+//  configObject: Object to use in the config file for finding active portals.
+func ListTunnel(node, configObject string) {
+    // Retrieve tunnel information from the config file
+    tunnels := viper.GetStringMap(configObject)
+
+    if node == "" {
+        // If no node is specified, list all tunnels
+        if len(tunnels) == 0 {
+            fmt.Println("No active tunnels found.")
+            return
+        }
+        fmt.Println("Active Portals:")
+        for node, tunnelInfo := range tunnels {
+			formatPortal(node,tunnelInfo)
+        }
+    } else {
+        // If a node is specified, list its tunnel information
+        tunnelInfo, exists := tunnels[strings.ToLower(node)]
+        if !exists {
+            fmt.Printf("No active tunnels found for node %s.\n", node)
+            return
+        }
+		fmt.Println("Active Portals:")
+		formatPortal(node,tunnelInfo)
+    }
+}
+
+// formatPortal formats active portal information for terminal output.
+//  node: The vsn of the node.
+//  tunnelInfo: tunnel information retrieved from viper.
+func formatPortal(node string, tunnelInfo interface{}) {
+	fmt.Printf("- Node: %s\n", strings.ToUpper(node))
+	if tunnelMap, ok := tunnelInfo.(map[string]interface{}); ok {
+		for key, value := range tunnelMap {
+			fmt.Printf("   - %s:%v\n", key, value)
+		}
+	} else {
+		fmt.Printf("   - Info: %v\n", tunnelInfo)
+	}
+}
