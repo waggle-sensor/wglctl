@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"strings"
 	"github.com/waggle-sensor/wglctl/logic"
 	"github.com/spf13/cobra"
@@ -16,37 +15,73 @@ var lorawanCmd = &cobra.Command{
 
 // lwPortalCmd represents the portal command
 var lwPortalCmd = &cobra.Command{
-	Use:   "portal <somenode> <up|down> [port]",
+	Use:   "portal",
+	Short: "Use to control ChirpStack portal(s).",
+	Long:  "portal is used to control the node's Chirpstack network server portal(s).",
+}
+
+// lwPortalupCmd represents the portal up command
+var lwPortalupCmd = &cobra.Command{
+	Use:   "up <somenode> [port]",
 	Short: "Use to access ChirpStack portal.",
-	Long:  `portal is used to access the node's Chirpstack network server portal.
+	Long:  `up is used to access the node's network switch portal.
 	
 	Arguments:
 	  <somenode>  The vsn of the node (e.g., "W030").
-	  <up|down>   The action to perform (either "up" to start the tunnel or "down" to stop it).
 	  [port]      The local port to use for the tunnel (optional, default is 8081).`,
-	Example: `portal W030 up 8082, portal W030 down`,
-	ValidArgs: []string{"up","down"},
-	Args:  cobra.MinimumNArgs(2), // Require at least 2 arguments
+	Example: `portal up W030, portal up W030 8082`,
+	Args:  cobra.MinimumNArgs(1), // Require at least 1 argument
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
 		node := strings.ToUpper(args[0])
-		action := args[1]
 		localPort := "8081" // Default port
 
-		if len(args) >= 3 {
-			localPort = args[2]
+		if len(args) >= 2 {
+			localPort = args[1]
 		}
 
-		switch action {
-		case "up":
-			portalIp := logic.GetChirpStackIp(node)
-			logic.StartPortal(node, localPort, "lora.portforwading", portalIp, "http", "8080")
-		case "down":
-			logic.StopTunnel(node, "lora.portforwading")
-		default:
-			fmt.Println("Invalid action:", action)
-			fmt.Println("Usage: portal <somenode> <up|down> [port]")
+		portalIp := logic.GetChirpStackIp(node)
+		logic.StartPortal(node, localPort, "lora.portforwading", portalIp, "http", "8080")
+	},
+}
+
+// lwPortaldownCmd represents the portal down command
+var lwPortaldownCmd = &cobra.Command{
+	Use:   "down <somenode>",
+	Short: "Use to terminate Chirpstack portal.",
+	Long:  `down is used to terminate the node's Chirpstack portal.
+	
+	Arguments:
+	  <somenode>  The vsn of the node (e.g., "W030").`,
+	Example: `portal down W030`,
+	Args:  cobra.ExactArgs(1), // Require exactly 1 argument
+	Run: func(cmd *cobra.Command, args []string) {
+		// Extract arguments
+		node := strings.ToUpper(args[0])
+
+		logic.StopTunnel(node, "lora.portforwading")
+	},
+}
+
+// lwPortalListCmd represents the portal ls command
+var lwPortalListCmd = &cobra.Command{
+	Use:   "ls [somenode]",
+	Short: "Use to list switch portal(s).",
+	Long:  `ls is used to list active Chirpstack portal(s).
+	
+	Arguments:
+	  [somenode]  The vsn of the node (e.g., "W030"). optional, default is all.`,
+	Example: `portal ls, portal ls W030`,
+	Args:  cobra.MaximumNArgs(1), // Require no greater than 1 argument
+	Run: func(cmd *cobra.Command, args []string) {
+		// Extract arguments
+		node := "" // Default node
+
+		if len(args) >= 1 {
+			node = strings.ToUpper(args[0])
 		}
+
+		logic.ListTunnel(node, "lora.portforwading")
 	},
 }
 
@@ -54,7 +89,13 @@ func init() {
 	// Add the lorawan command to the root
 	rootCmd.AddCommand(lorawanCmd)
 
+	// Add the portal command as a subcommand of lorawan
 	lorawanCmd.AddCommand(lwPortalCmd)
+
+	// Add the actions for the portal command
+	lwPortalCmd.AddCommand(lwPortalupCmd)
+	lwPortalCmd.AddCommand(lwPortaldownCmd)
+	lwPortalCmd.AddCommand(lwPortalListCmd)
 
 	// Here you will define your flags and configuration settings.
 
