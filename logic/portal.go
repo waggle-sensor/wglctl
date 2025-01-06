@@ -13,7 +13,7 @@ import (
 //  configObject: Object to use in the config file for persistant storage of active portals.
 //  portalIp: The ip of the portal in the Node.
 //  portalPort: The port of the portal in the Node.
-func StartPortal(node, localPort, configObject, portalIp , portalPort string) {
+func StartPortal(node, localPort, configObject, portalIp , protocol, portalPort string) {
     fmt.Printf("Starting tunnel to %s for portal access on port %s...\n", node, localPort)
 
 	// Retrieve tunnel information from the config file
@@ -29,7 +29,7 @@ func StartPortal(node, localPort, configObject, portalIp , portalPort string) {
 		}
 		port, _ := tunnel["localport"].(string)
 		fmt.Printf("A tunnel is already active for node %s on port %s.\n", node, port)
-		fmt.Printf("Visit portal at http://localhost:%s\n", port)
+		fmt.Printf("Visit portal at %s://localhost:%s\n", protocol, port)
 		return
 	}
 
@@ -72,7 +72,7 @@ func StartPortal(node, localPort, configObject, portalIp , portalPort string) {
     }
 
     fmt.Printf("Tunnel to %s established.\n", node)
-    fmt.Printf("Visit portal at http://localhost:%s\n", localPort)
+    fmt.Printf("Visit portal at %s://localhost:%s\n", protocol, localPort)
 }
 
 // StopTunnel stops the port forwarding for a given node's portalIp:portalPort.

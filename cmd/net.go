@@ -46,7 +46,7 @@ var switchPortalCmd = &cobra.Command{
 
 		switch action {
 		case "up":
-			logic.StartPortal(node, localPort, "net.switch.portforwading", "switch", "443")
+			logic.StartPortal(node, localPort, "net.switch.portforwading", "switch", "https", "443")
 		case "down":
 			logic.StopTunnel(node, "net.switch.portforwading")
 		default:

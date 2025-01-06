@@ -40,7 +40,7 @@ var lwPortalCmd = &cobra.Command{
 		switch action {
 		case "up":
 			portalIp := logic.GetChirpStackIp(node)
-			logic.StartPortal(node, localPort, "lora.portforwading", portalIp, "8080")
+			logic.StartPortal(node, localPort, "lora.portforwading", portalIp, "http", "8080")
 		case "down":
 			logic.StopTunnel(node, "lora.portforwading")
 		default:
