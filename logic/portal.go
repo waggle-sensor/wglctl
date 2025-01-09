@@ -97,11 +97,7 @@ func StopAll(configObject string) {
 	}
 
 	// Update the configuration file
-	viper.Set(configObject, tunnels)
-	if err := viper.WriteConfig(); err != nil {
-		fmt.Printf("Error updating configuration file: %v\n", err)
-	} 
-
+	updateConfig(configObject,tunnels)
 	fmt.Println("All active tunnels have been stopped.")
 }
 
@@ -121,15 +117,11 @@ func StopTunnel(node, configObject string) {
 
 	// Stop the process for the specified node
 	stopProcess(node, tunnelInfo)
+	fmt.Println("Stopped")
 
 	// Remove the node from the configuration file
 	delete(tunnels, strings.ToLower(node))
-	viper.Set(configObject, tunnels)
-	if err := viper.WriteConfig(); err != nil {
-		fmt.Printf("Error updating configuration file: %v\n", err)
-	} else {
-		fmt.Println("Configuration file updated.")
-	}
+	updateConfig(configObject,tunnels)
 }
 
 // ListTunnel lists the current portals that are up.
@@ -218,5 +210,13 @@ func stopProcess(node string, tunnelInfo interface{}) {
 		if err := killCmd.Run(); err != nil {
 			fmt.Printf("Failed to stop tunnel for node %s (PID %s): %v\n", node, pid, err)
 		}
+	}
+}
+
+// updateConfig updates the configuration file with the current state of tunnels.
+func updateConfig(configObject string, tunnels map[string]interface{}) {
+	viper.Set(configObject, tunnels)
+	if err := viper.WriteConfig(); err != nil {
+		fmt.Printf("Error updating configuration file: %v\n", err)
 	}
 }
