@@ -53,19 +53,24 @@ var switchPortalupCmd = &cobra.Command{
 
 // switchPortaldownCmd represents the portal down command
 var switchPortaldownCmd = &cobra.Command{
-	Use:   "down <somenode>",
+	Use:   "down <somenode/all>",
 	Short: "Use to terminate switch portal.",
-	Long:  `down is used to terminate the node's network switch portal.
+	Long:  `down is used to terminate the node's network switch portal or all active switch portals.
 	
 	Arguments:
-	  <somenode>  The vsn of the node (e.g., "W030").`,
+	  <somenode/all>  The vsn of the node (e.g., "W030") or all.`,
 	Example: `portal down W030`,
 	Args:  cobra.ExactArgs(1), // Require exactly 1 argument
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
-		node := strings.ToUpper(args[0])
+		arg := strings.ToUpper(args[0])
+		config := "net.switch.portforwading"
 
-		logic.StopTunnel(node, "net.switch.portforwading")
+		if arg == "ALL" {
+			logic.StopAll(config)
+		} else {
+			logic.StopTunnel(arg, config)
+		}
 	},
 }
 

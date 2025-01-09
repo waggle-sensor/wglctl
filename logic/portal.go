@@ -75,11 +75,41 @@ func StartPortal(node, localPort, configObject, portalIp , protocol, portalPort 
     fmt.Printf("Visit portal at %s://localhost:%s\n", protocol, localPort)
 }
 
-// StopTunnel stops the port forwarding for a given node's portalIp:portalPort.
-// 	node: The vsn of the node.
-//  configObject: Object to use in the config file for finding active Portals.
+// StopAll stops port forwarding for all nodes.
+// configObject: Object to use in the config file for finding active portals.
+func StopAll(configObject string) {
+	fmt.Println("Stopping tunnels for all nodes...")
+
+	// Retrieve tunnel information from the config file
+	tunnels := viper.GetStringMap(configObject)
+
+	// Check if there are any active tunnels
+	if len(tunnels) == 0 {
+		fmt.Println("No active tunnels found.")
+		return
+	}
+
+	// Iterate through each node and stop its tunnel
+	for node, tunnelInfo := range tunnels {
+		stopProcess(node, tunnelInfo)
+		// Remove the node from the configuration
+		delete(tunnels, strings.ToLower(node))
+	}
+
+	// Update the configuration file
+	viper.Set(configObject, tunnels)
+	if err := viper.WriteConfig(); err != nil {
+		fmt.Printf("Error updating configuration file: %v\n", err)
+	} 
+
+	fmt.Println("All active tunnels have been stopped.")
+}
+
+// StopTunnel stops the port forwarding for a specific node.
+// node: The vsn of the node.
+// configObject: Object to use in the config file for finding active portals.
 func StopTunnel(node, configObject string) {
-	fmt.Printf("Stopping tunnel for %s...\n", node)
+	fmt.Printf("Stopping tunnel for node %s...\n", node)
 
 	// Retrieve tunnel information from the config file
 	tunnels := viper.GetStringMap(configObject)
@@ -89,52 +119,16 @@ func StopTunnel(node, configObject string) {
 		return
 	}
 
-    // Extract the port and IP from the configuration
-    tunnel, ok := tunnelInfo.(map[string]interface{})
-    if !ok {
-        fmt.Printf("Invalid port forwading configuration for node %s.\n", node)
-		fmt.Printf("Fix the config file.\n")
-        return
-    }
-    localPort, localPortExists := tunnel["localport"].(string)
-    ip, ipExists := tunnel["svcip"].(string)
-	svcPort, svcPortExists := tunnel["svcport"].(string)
-    if !localPortExists || !ipExists || !svcPortExists {
-        fmt.Printf("Missing %s configuration for node %s.\n", configObject, node)
-        return
-    }
-	if !exists {
-		fmt.Printf("No active tunnel found for node %s.\n", node)
-		return
-	}
+	// Stop the process for the specified node
+	stopProcess(node, tunnelInfo)
 
-	// Construct the pattern to match the exact command
-	pattern := fmt.Sprintf("ssh -N -L %s:%s:%s node-%s", localPort, ip, svcPort, node)
-
-	// Use pgrep to find the process matching the pattern
-	pgrepCmd := exec.Command("pgrep", "-f", pattern)
-	pids, err := pgrepCmd.Output()
-
-	if err != nil || len(pids) == 0 {
-		fmt.Printf("No active SSH proxy found for node %s.\n", node)
-		return
-	}
-
-	// Kill the process
-	pidList := strings.Fields(string(pids))
-	for _, pid := range pidList {
-		killCmd := exec.Command("kill", pid)
-		if err := killCmd.Run(); err != nil {
-			fmt.Printf("Failed to stop tunnel for %s (PID %s): %v\n", node, pid, err)
-		}
-	}
-	fmt.Printf("Stopped\n")
-
-	// Remove the tunnel from the configuration file
+	// Remove the node from the configuration file
 	delete(tunnels, strings.ToLower(node))
 	viper.Set(configObject, tunnels)
 	if err := viper.WriteConfig(); err != nil {
 		fmt.Printf("Error updating configuration file: %v\n", err)
+	} else {
+		fmt.Println("Configuration file updated.")
 	}
 }
 
@@ -178,5 +172,51 @@ func formatPortal(node string, tunnelInfo interface{}) {
 		}
 	} else {
 		fmt.Printf("   - Info: %v\n", tunnelInfo)
+	}
+}
+
+// stopProcess stops the process associated with a tunnel.
+//  node: The vsn of the node.
+//  tunnelInfo: tunnel information retrieved from viper.
+func stopProcess(node string, tunnelInfo interface{}) {
+	//all caps the node
+	node = strings.ToUpper(node)
+	
+	// Extract the port and IP from the configuration
+	tunnel, ok := tunnelInfo.(map[string]interface{})
+	if !ok {
+		fmt.Printf("Invalid port forwarding configuration for node %s.\n", node)
+		fmt.Printf("Fix the config file %s.\n", viper.ConfigFileUsed())
+		return
+	}
+
+	localPort, localPortExists := tunnel["localport"].(string)
+	ip, ipExists := tunnel["svcip"].(string)
+	svcPort, svcPortExists := tunnel["svcport"].(string)
+
+	if !localPortExists || !ipExists || !svcPortExists {
+		fmt.Printf("Missing configuration for node %s.\n", node)
+		return
+	}
+
+	// Construct the pattern to match the exact command
+	pattern := fmt.Sprintf("ssh -N -L %s:%s:%s node-%s", localPort, ip, svcPort, node)
+
+	// Use pgrep to find the process matching the pattern
+	pgrepCmd := exec.Command("pgrep", "-f", pattern)
+	pids, err := pgrepCmd.Output()
+
+	if err != nil || len(pids) == 0 {
+		fmt.Printf("No active SSH proxy found for node %s.\n", node)
+		return
+	}
+
+	// Kill the processes associated with the tunnel
+	pidList := strings.Fields(string(pids))
+	for _, pid := range pidList {
+		killCmd := exec.Command("kill", pid)
+		if err := killCmd.Run(); err != nil {
+			fmt.Printf("Failed to stop tunnel for node %s (PID %s): %v\n", node, pid, err)
+		}
 	}
 }

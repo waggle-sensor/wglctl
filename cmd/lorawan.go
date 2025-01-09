@@ -47,19 +47,24 @@ var lwPortalupCmd = &cobra.Command{
 
 // lwPortaldownCmd represents the portal down command
 var lwPortaldownCmd = &cobra.Command{
-	Use:   "down <somenode>",
+	Use:   "down <somenode/all>",
 	Short: "Use to terminate Chirpstack portal.",
-	Long:  `down is used to terminate the node's Chirpstack portal.
+	Long:  `down is used to terminate the node's Chirpstack portal or all active Chirpstack portals.
 	
 	Arguments:
-	  <somenode>  The vsn of the node (e.g., "W030").`,
+	  <somenode/all>  The vsn of the node (e.g., "W030") or all.`,
 	Example: `portal down W030`,
 	Args:  cobra.ExactArgs(1), // Require exactly 1 argument
 	Run: func(cmd *cobra.Command, args []string) {
 		// Extract arguments
-		node := strings.ToUpper(args[0])
+		arg := strings.ToUpper(args[0])
+		config := "lora.portforwading"
 
-		logic.StopTunnel(node, "lora.portforwading")
+		if arg == "ALL" {
+			logic.StopAll(config)
+		} else {
+			logic.StopTunnel(arg, config)
+		}
 	},
 }
 
