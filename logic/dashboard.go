@@ -16,15 +16,18 @@ func OpenDashboard(vsn string) {
 	url := grafanaBaseURL
 	if vsn != "" {
 		url += "/d/" + dashboard_id + "?var-vsn=" + vsn
+		fmt.Printf("Opening Grafana dashboard for %s: \n", vsn)
+	} else {
+		url += "/d/" + dashboard_id
+		fmt.Println("Opening Grafana dashboard: ")
 	}
-
-	fmt.Printf("Opening Grafana dashboard for node: %s\n", vsn)
 
 	// Open the URL in the default web browser
 	err := openBrowser(url)
 	if err != nil {
 		fmt.Println("Failed to open browser:", err)
 	}
+	fmt.Println(url)
 }
 
 // SetGrafanaURL sets and stores the Grafana base URL in the config file
