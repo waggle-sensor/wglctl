@@ -29,9 +29,21 @@ func RestartConfig() {
 	fmt.Println("Configuration reset successfully.")
 }
 
+// PrintConfig prints the raw contents of the config file
 func PrintConfig() {
-	fmt.Println("Current wglctl Configuration:")
-	for _, key := range viper.AllKeys() {
-		fmt.Printf("%s: %v\n", key, viper.Get(key))
+	configFile := viper.ConfigFileUsed() // Get the config file path
+
+	if configFile == "" {
+		fmt.Println("No configuration file found.")
+		return
 	}
+
+	// Read the raw file content
+	content, err := os.ReadFile(configFile)
+	if err != nil {
+		fmt.Printf("Error reading config file: %v\n", err)
+		return
+	}
+
+	fmt.Println(string(content)) // Print the raw config file content
 }
