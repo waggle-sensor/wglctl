@@ -75,6 +75,9 @@ func initConfig() {
 		viper.AddConfigPath(configDir)
 		viper.SetConfigType("yaml")
 		viper.SetConfigName("config")
+
+		// set the config file path
+		cfgFile = filepath.Join(configDir, "config.yaml")
 	}
 
 	// Read environment variables automatically
@@ -100,15 +103,9 @@ func setDefaultConfig(key string, value string) {
 	}
 }
 
-// saveConfig writes the current viper config to the config file, creating it if necessary
+// saveConfig writes the current viper config to the config file
 func saveConfig() {
-	if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
-		if os.IsExist(err) {
-			// Config file already exists, so update it instead
-			err = viper.WriteConfig()
-		}
-		if err != nil {
-			fmt.Printf("Error writing config file: %v\n", err)
-		}
+	if err := viper.WriteConfig(); err != nil {
+		fmt.Printf("Error updating configuration file: %v\n", err)
 	}
 }
