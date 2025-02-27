@@ -4,6 +4,7 @@ import (
 	"strings"
 	"github.com/waggle-sensor/wglctl/logic"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // lorawanCmd represents the lorawan command
@@ -105,7 +106,7 @@ var setLorawanDashboardIDCmd = &cobra.Command{
 }
 
 // lwReportCmd represents the report command
-var lwReportCmd = &cobra.Command{
+var lwdashbordCmd = &cobra.Command{
 	Use:   "dashboard <somenode>",
 	Short: "Use to access a lorawan dashboard of the node.",
 	Long:  `dashboard is used to access a lorawan Grafana dashboard of the node. If no node is provided, 
@@ -135,7 +136,9 @@ func init() {
 	lorawanCmd.AddCommand(setLorawanDashboardIDCmd)
 
 	// Add the report command as a subcommand of lorawan
-	lorawanCmd.AddCommand(lwReportCmd)
+	lorawanCmd.AddCommand(lwdashbordCmd)
+	lwdashbordCmd.PersistentFlags().String("grafana-lw-dashboard-id", "", "Grafana Lorawan dashboard ID")
+	viper.BindPFlag("GRAFANA_LW_DASHBOARD_ID", lwdashbordCmd.PersistentFlags().Lookup("grafana-lw-dashboard-id"))
 
 	// Add the portal command as a subcommand of lorawan
 	lorawanCmd.AddCommand(lwPortalCmd)

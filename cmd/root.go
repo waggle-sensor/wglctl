@@ -45,9 +45,7 @@ func init() {
 	// Grafana Base URL flag
 	// This allows users to override the variables using a CLI flag
 	rootCmd.PersistentFlags().String("grafana-base-url", "", "Base URL for Grafana dashboards")
-	rootCmd.PersistentFlags().String("grafana-lw-dashboard-id", "", "Grafana Lorawan dashboard ID")
 	viper.BindPFlag("GRAFANA_BASE_URL", rootCmd.PersistentFlags().Lookup("grafana-base-url"))
-	viper.BindPFlag("GRAFANA_LW_DASHBOARD_ID", rootCmd.PersistentFlags().Lookup("grafana-lw-dashboard-id"))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
