@@ -28,3 +28,10 @@ func RestartConfig() {
 
 	fmt.Println("Configuration reset successfully.")
 }
+
+func PrintConfig() {
+	fmt.Println("Current wglctl Configuration:")
+	for _, key := range viper.AllKeys() {
+		fmt.Printf("%s: %v\n", key, viper.Get(key))
+	}
+}

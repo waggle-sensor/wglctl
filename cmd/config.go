@@ -38,6 +38,18 @@ var setGrafanaURLCmd = &cobra.Command{
 	},
 }
 
+// printConfigCmd represents the command to print the current configuration
+var printConfigCmd = &cobra.Command{
+	Use:   "print",
+	Short: "Print the current wglctl configuration.",
+	Long:  `This command prints all the current configuration settings used by wglctl.`,
+	Example: `wglctl config print`,
+	Args: cobra.ExactArgs(0),
+	Run: func(cmd *cobra.Command, args []string) {
+		logic.PrintConfig()
+	},
+}
+
 func init() {
 
 	// Add the config command to the root
@@ -45,6 +57,7 @@ func init() {
 
 	configCmd.AddCommand(restartCmd)
 	configCmd.AddCommand(setGrafanaURLCmd)
+	configCmd.AddCommand(printConfigCmd)
 
 	// Here you will define your flags and configuration settings.
 
