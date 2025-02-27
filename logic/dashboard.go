@@ -3,7 +3,8 @@ package logic
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	 "os"
+	"os"
+	"strings"
 )
 
 func OpenDashboard(vsn string) {
@@ -26,14 +27,18 @@ func OpenDashboard(vsn string) {
 	}
 }
 
+// SetGrafanaURL sets and stores the Grafana base URL in the config file
 func SetGrafanaURL(url string) {
 	// Validate URL format 
-	if len(url) < 10 || !(url[:4] == "http") {
+	if len(url) < 10 || !(strings.HasPrefix(url, "http")) {
 		fmt.Println("Invalid URL. Please provide a valid Grafana URL, e.g., http://your-grafana-url")
 		os.Exit(1)
 	}
 
-	// Store the URL in Viper
+	// Remove any proceeding '/' from the URL
+	url = strings.TrimRight(url, "/")
+
+	// Store the cleaned URL in Viper
 	viper.Set("GRAFANA_BASE_URL", url)
 
 	// Save the configuration persistently
