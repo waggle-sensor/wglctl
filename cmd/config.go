@@ -24,12 +24,27 @@ var restartCmd = &cobra.Command{
 	},
 }
 
+// setGrafanaURLCmd represents the command to set the Grafana Base URL
+var setGrafanaURLCmd = &cobra.Command{
+	Use:   "set-grafana-url <url>",
+	Short: "Set the base URL for commands that use Grafana.",
+	Long: `This command sets the base URL for Grafana. 
+	It saves the URL in the configuration so all Grafana-related commands use it.`,
+	Args: cobra.ExactArgs(1), // Ensure exactly one argument (the URL)
+	Run: func(cmd *cobra.Command, args []string) {
+		url := args[0] // Get the user-provided URL
+
+		logic.SetGrafanaURL(url)
+	},
+}
+
 func init() {
 
 	// Add the config command to the root
 	rootCmd.AddCommand(configCmd)
 
 	configCmd.AddCommand(restartCmd)
+	configCmd.AddCommand(setGrafanaURLCmd)
 
 	// Here you will define your flags and configuration settings.
 
