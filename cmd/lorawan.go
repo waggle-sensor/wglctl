@@ -90,9 +90,52 @@ var lwPortalListCmd = &cobra.Command{
 	},
 }
 
+// setLorawanDashboardIDCmd represents the command to set the LoRaWAN Dashboard ID
+var setLorawanDashboardIDCmd = &cobra.Command{
+	Use:   "set-lorawan-dashboard-id <dashboard_id>",
+	Short: "Set the LoRaWAN dashboard ID for Grafana",
+	Long: `This command sets the LoRaWAN dashboard ID for Grafana. 
+	It saves the ID in the configuration so all lorawan dashboard-related commands use it.`,
+	Args: cobra.ExactArgs(1), // Ensure exactly one argument (the ID)
+	Run: func(cmd *cobra.Command, args []string) {
+		dashboardID := args[0]
+
+		logic.SetLorawanDashboardID(dashboardID)
+	},
+}
+
+// lwReportCmd represents the report command
+var lwReportCmd = &cobra.Command{
+	Use:   "dashboard <somenode>",
+	Short: "Use to access a lorawan dashboard of the node.",
+	Long:  `dashboard is used to access a lorawan Grafana dashboard of the node. If no node is provided, 
+	the default will just open the Grafana dashboard with the default node selected.
+	
+	Arguments:
+	  <somenode>  The vsn of the node (e.g., "W030"). optional, default is None.`,
+	Example: `dashboard, dashboard W030`,
+	Args:  cobra.MaximumNArgs(1), // Require no greater than 1 argument
+	Run: func(cmd *cobra.Command, args []string) {
+		// Extract arguments
+		node := "" // Default node
+
+		if len(args) >= 1 {
+			node = strings.ToUpper(args[0])
+		}
+
+		logic.OpenDashboard(node)
+	},
+}
+
 func init() {
 	// Add the lorawan command to the root
 	rootCmd.AddCommand(lorawanCmd)
+
+	// Add the set-lorawan-dashboard-id command as a subcommand of lorawan
+	lorawanCmd.AddCommand(setLorawanDashboardIDCmd)
+
+	// Add the report command as a subcommand of lorawan
+	lorawanCmd.AddCommand(lwReportCmd)
 
 	// Add the portal command as a subcommand of lorawan
 	lorawanCmd.AddCommand(lwPortalCmd)
