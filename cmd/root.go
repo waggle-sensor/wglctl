@@ -39,7 +39,15 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
+	// Global config flag for specifying a custom config file
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.config/wglctl/config.yaml)")
+
+	// Grafana Base URL flag
+	// This allows users to override the variables using a CLI flag
+	rootCmd.PersistentFlags().String("grafana-base-url", "", "Base URL for Grafana dashboards")
+	rootCmd.PersistentFlags().String("grafana-lw-dashboard-id", "", "Grafana Lorawan dashboard ID")
+	viper.BindPFlag("GRAFANA_BASE_URL", rootCmd.PersistentFlags().Lookup("grafana-base-url"))
+	viper.BindPFlag("GRAFANA_LW_DASHBOARD_ID", rootCmd.PersistentFlags().Lookup("grafana-lw-dashboard-id"))
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -69,9 +77,38 @@ func initConfig() {
 		viper.SetConfigName("config")
 	}
 
-	viper.AutomaticEnv() // read in environment variables that match
+	// Read environment variables automatically
+	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err != nil { //read in the config file
-		fmt.Printf("Error reading config file: %v\n", err)
+	// Try to read the config file, but don't fail if it doesn't exist
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("No existing config file found. Creating a new one: %s\n", cfgFile)
+	}
+
+	// Set default values only if they are missing
+	setDefaultConfig("GRAFANA_BASE_URL", "http://localhost:3000")
+	setDefaultConfig("GRAFANA_LW_DASHBOARD_ID", "1")
+
+	// Save the config if any defaults were added
+	saveConfig()
+}
+
+// setDefaultConfig sets a default value only if the key is missing
+func setDefaultConfig(key string, value string) {
+	if !viper.IsSet(key) {
+		viper.Set(key, value)
+	}
+}
+
+// saveConfig writes the current viper config to the config file, creating it if necessary
+func saveConfig() {
+	if err := viper.SafeWriteConfigAs(cfgFile); err != nil {
+		if os.IsExist(err) {
+			// Config file already exists, so update it instead
+			err = viper.WriteConfig()
+		}
+		if err != nil {
+			fmt.Printf("Error writing config file: %v\n", err)
+		}
 	}
 }
