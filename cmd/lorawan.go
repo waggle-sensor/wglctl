@@ -24,7 +24,7 @@ var lwPortalCmd = &cobra.Command{
 var lwPortalupCmd = &cobra.Command{
 	Use:   "up <somenode> [port]",
 	Short: "Use to access ChirpStack portal.",
-	Long:  `up is used to access the node's network switch portal.
+	Long:  `up is used to access the node's Chirpstack network server portal.
 	
 	Arguments:
 	  <somenode>  The vsn of the node (e.g., "W030").
@@ -71,7 +71,7 @@ var lwPortaldownCmd = &cobra.Command{
 // lwPortalListCmd represents the portal ls command
 var lwPortalListCmd = &cobra.Command{
 	Use:   "ls [somenode]",
-	Short: "Use to list switch portal(s).",
+	Short: "Use to list portal(s).",
 	Long:  `ls is used to list active Chirpstack portal(s).
 	
 	Arguments:
